@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 
+: ${DB_INSTITUICAO:=1}
 : ${DB_SERVIDOR:=$POSTGRES_PORT_5432_TCP_ADDR}
 : ${DB_USUARIO:=${POSTGRES_ENV_POSTGRES_USER:-ecidade}}
 : ${DB_SENHA:=${POSTGRES_ENV_POSTGRES_PASSWORD:-}}
@@ -45,11 +46,12 @@ sed -i '646s/.*/error_log = \/var\/www\/log\/php-scripts.log/' /etc/php5/apache2
 sed -i '1516s/.*/session.gc_maxlifetime = 7200/' /etc/php5/apache2/php.ini
 
 echo 'Configurando db_conn.php'
+sed -i "28s/.*/\$DB_INSTITUICAO = $DB_INSTITUICAO;/" /var/www/e-cidadeonline/libs/db_conn.php
+sed -i "29s/.*/\$DB_SERVIDOR = \"$DB_SERVIDOR\";/" /var/www/e-cidadeonline/libs/db_conn.php
+sed -i "30s/.*/\$DB_BASEDADOS = \"$DB_BASE\";/" /var/www/e-cidadeonline/libs/db_conn.php
 sed -i "31s/.*/\$DB_USUARIO = \"$DB_USUARIO\";/" /var/www/e-cidadeonline/libs/db_conn.php
 sed -i "32s/.*/\$DB_SENHA = \"$DB_SENHA\";/" /var/www/e-cidadeonline/libs/db_conn.php
-sed -i "29s/.*/\$DB_SERVIDOR = \"$DB_SERVIDOR\";/" /var/www/e-cidadeonline/libs/db_conn.php
 sed -i "33s/.*/\$DB_PORTA = \"$DB_PORTA\";/" /var/www/e-cidadeonline/libs/db_conn.php
-sed -i "30s/.*/\$DB_BASEDADOS = \"$DB_BASE\";/" /var/www/e-cidadeonline/libs/db_conn.php
 
 echo 'Iniciando apache2'
 source /etc/apache2/envvars && exec /usr/sbin/apache2 -DFOREGROUND
